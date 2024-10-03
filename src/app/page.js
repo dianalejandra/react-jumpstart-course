@@ -1,95 +1,126 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+/* eslint-disable no-param-reassign, operator-assignment */
+// To inform next js, this is a client component
+"use client";
+import "semantic-ui-css/semantic.min.css";
+import { useState, useEffect } from "react";
 
-export default function Home() {
+function App() {
+  const [isClient, setIsClient] = useState(false)
+ 
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+  
+  function generateVoteCount() {
+    if (isClient ){
+    return Math.floor((Math.random() * 50) + 15);
+     }
+     return 0;
+  }
+
+  const products = [
+    {
+      id: 1,
+      title: "Yellow Pail",
+      description: "On-demand sand castle construction expertise.",
+      url: "#",
+      votes: generateVoteCount(),
+      submitterAvatarUrl: "/images/avatars/daniel.jpg",
+      productImageUrl: "/images/products/image-aqua.png",
+    },
+    {
+      id: 2,
+      title: "Supermajority: The Fantasy Congress League",
+      description:
+        "Earn points when your favorite politicians pass legislation.",
+      url: "#",
+      votes: generateVoteCount(),
+      submitterAvatarUrl: "/images/avatars/kristy.png",
+      productImageUrl: "/images/products/image-rose.png",
+    },
+    {
+      id: 3,
+      title: "Tinfoild: Tailored tinfoil hats",
+      description: "We already have your measurements and shipping address.",
+      url: "#",
+      votes: generateVoteCount(),
+      submitterAvatarUrl: "/images/avatars/veronika.jpg",
+      productImageUrl: "/images/products/image-steel.png",
+    },
+    {
+      id: 4,
+      title: "Haught or Naught",
+      description: "High-minded or absent-minded? You decide.",
+      url: "#",
+      votes: generateVoteCount(),
+      submitterAvatarUrl: "/images/avatars/molly.png",
+      productImageUrl: "/images/products/image-yellow.png",
+    },
+  ];
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Hello world! I am Diana! Get started by editing <code>src/app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+<div className="App main ui text container">
+<h1 className="ui dividing centered header">Popular Products</h1>
+      <ProductList products={products} />
     </div>
   );
 }
+
+function ProductList(props) {
+
+  function handleProductUpVote(productId) {
+    console.log(productId + ' was upvoted.');
+  }
+
+  const productsSorted = props.products.sort((a, b) => b.votes - a.votes);
+
+  const productComponents = productsSorted.map((product) => (
+    <Product
+      key={"product-" + product.id}
+      id={product.id}
+      title={product.title}
+      description={product.description}
+      url={product.url}
+      votes={product.votes}
+      submitterAvatarUrl={product.submitterAvatarUrl}
+      productImageUrl={product.productImageUrl}
+      onVote={handleProductUpVote}
+
+    />
+  ));
+  return <div className="ui unstackable items">{productComponents}</div>;
+}
+
+function Product(props) {
+  function handleUpVote() {
+    props.onVote(props.id);
+  }
+
+  return (
+    <div className="item">
+      <div className="image">
+        <img src={props.productImageUrl} />
+  
+      </div>
+      <div className="middle aligned content">
+        <div className="header">
+          <a onClick={handleUpVote}>
+           
+            <i className="large caret up icon" />
+          </a>
+          {props.votes}
+        </div>
+        <div className="description">
+          <a href={props.url}>{props.title}</a>
+          <p>{props.description}</p>
+          
+        </div>
+        <div className="extra">
+          <span>Submitted by:</span>
+          <img className="ui avatar image" src={props.submitterAvatarUrl} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default App;
