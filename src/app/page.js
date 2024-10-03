@@ -5,17 +5,9 @@ import "semantic-ui-css/semantic.min.css";
 import { useState, useEffect } from "react";
 
 function App() {
-  const [isClient, setIsClient] = useState(false)
- 
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
   
   function generateVoteCount() {
-    if (isClient ){
-    return Math.floor((Math.random() * 50) + 15);
-     }
-     return 0;
+       return Math.floor((Math.random() * 50) + 15);
   }
 
   const products = [
@@ -66,12 +58,41 @@ function App() {
 }
 
 function ProductList(props) {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    setProducts(props.products);
+  }, []);
 
   function handleProductUpVote(productId) {
-    console.log(productId + ' was upvoted.');
+    const nextProducts = products.map((product) => {
+      if (product.id === productId) {
+        return Object.assign({}, product, {
+          votes: product.votes + 1,
+        });
+      } else {
+        return product;
+      }
+    });
+
+    setProducts(nextProducts);
   }
 
-  const productsSorted = props.products.sort((a, b) => b.votes - a.votes);
+  function handleProductDownVote(productId) {
+    const nextProducts = products.map((product) => {
+      if (product.id === productId) {
+        return Object.assign({}, product, {
+          votes: product.votes - 1,
+        });
+      } else {
+        return product;
+      }
+    });
+
+    setProducts(nextProducts);
+  }
+
+  const productsSorted = products.sort((a, b) => b.votes - a.votes);
 
   const productComponents = productsSorted.map((product) => (
     <Product
@@ -83,8 +104,8 @@ function ProductList(props) {
       votes={product.votes}
       submitterAvatarUrl={product.submitterAvatarUrl}
       productImageUrl={product.productImageUrl}
-      onVote={handleProductUpVote}
-
+      onUpVote={handleProductUpVote}
+      onDownVote={handleProductDownVote}
     />
   ));
   return <div className="ui unstackable items">{productComponents}</div>;
@@ -92,7 +113,10 @@ function ProductList(props) {
 
 function Product(props) {
   function handleUpVote() {
-    props.onVote(props.id);
+    props.onUpVote(props.id);
+  }
+  function handleDownVote() {
+    props.onDownVote(props.id);
   }
 
   return (
@@ -103,11 +127,15 @@ function Product(props) {
       </div>
       <div className="middle aligned content">
         <div className="header">
-          <a onClick={handleUpVote}>
-           
-            <i className="large caret up icon" />
-          </a>
-          {props.votes}
+          <div className="arrow-container">
+            <a onClick={handleUpVote}>          
+              <i className="large caret up icon" />
+            </a>
+            <a onClick={handleDownVote}>          
+              <i className="large caret down icon" />
+            </a>
+          </div>          
+          <div className="counter">{props.votes}</div>
         </div>
         <div className="description">
           <a href={props.url}>{props.title}</a>

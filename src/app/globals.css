@@ -59,3 +59,17 @@ a {
 .description {
   text-align: center;
 }
+
+.header {
+  display: flex !important;
+  flex-direction: row;
+}
+
+.arrow-container{
+  display: flex;
+  flex-direction: column;
+}
+.counter{
+  margin-top: 20px;
+}
+
